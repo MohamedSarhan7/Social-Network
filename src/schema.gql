@@ -3,9 +3,19 @@
 # ------------------------------------------------------
 
 type Comment {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  id: String!
+  content: String!
+  postId: String!
+  userId: String!
+  user: User!
+  created_at: DateTime!
+  updated_at: DateTime!
 }
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
 
 type Post {
   id: String!
@@ -17,11 +27,6 @@ type Post {
   user: User!
   userId: String!
 }
-
-"""
-A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
-"""
-scalar DateTime
 
 type User {
   id: String!
@@ -43,17 +48,18 @@ type Query {
   users: [User!]!
   user(username: String!): User!
   posts: [Post!]!
-  post(id: Int!): Post!
-  comment(id: Int!): Comment!
+  post(id: String!): Post!
+  comments: [Comment!]!
+  comment(id: String!): Comment!
 }
 
 type Mutation {
   createPost(createPostInput: CreatePostInput!): Post!
   updatePost(updatePostInput: UpdatePostInput!): Post!
-  removePost(id: Int!): Post!
+  removePost(id: String!): Post!
   createComment(createCommentInput: CreateCommentInput!): Comment!
   updateComment(updateCommentInput: UpdateCommentInput!): Comment!
-  removeComment(id: Int!): Comment!
+  removeComment(id: String!): Comment!
   Login(loginInput: LoginInput!): AuthResponse!
   Register(registerInput: RegisterInput!): AuthResponse!
 }
@@ -68,14 +74,14 @@ input UpdatePostInput {
 }
 
 input CreateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int!
+  content: String!
+  postId: String!
 }
 
 input UpdateCommentInput {
-  """Example field (placeholder)"""
-  exampleField: Int
-  id: Int!
+  content: String
+  postId: String
+  id: String!
 }
 
 input LoginInput {
