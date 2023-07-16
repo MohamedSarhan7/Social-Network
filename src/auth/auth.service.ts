@@ -86,7 +86,7 @@ export class AuthService {
       }),
       this.jwtService.signAsync(JwtPayload, {
         secret: this.configService.get('refresh_token_secret'),
-        expiresIn: this.configService.get('access_token_expiresin'),
+        expiresIn: this.configService.get('refresh_token_expiresin'),
       }),
     ]);
 

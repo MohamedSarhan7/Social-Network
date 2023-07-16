@@ -1,20 +1,21 @@
-import { Injectable } from '@nestjs/common';
-// import { CreateUserInput } from './dto/create-user.input';
-// import { UpdateUserInput } from './dto/update-user.input';
-import { LoginInput } from '../auth/dto/auth-login.input';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { User } from './entities/user.entity';
+import { PrismaService } from '../prisma/prisma.service';
+// import { gqlE } from '@nestjs/graphql'
 
 @Injectable()
 export class UserService {
-  create(createUserInput: LoginInput) {
-    return 'This action adds a new user';
+  constructor(private readonly prismaService: PrismaService) {}
+  async findAll(): Promise<User[]> {
+    return await this.prismaService.user.findMany();
   }
 
-  findAll() {
-    return `This action returns all user`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} user`;
+  async findOne(username: string): Promise<User> {
+    const user = await this.prismaService.user.findUnique({
+      where: { username },
+    });
+    if (!user) throw new NotFoundException('user not found');
+    return new User(user);
   }
 
   // update(id: number, updateUserInput: UpdateUserInput) {

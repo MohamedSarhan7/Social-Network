@@ -1,6 +1,10 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
+import { GqlExecutionContext } from '@nestjs/graphql';
 
-export const User = createParamDecorator((data, context: ExecutionContext) => {
-  const request = context.switchToHttp().getRequest();
-  return request.user;
-});
+export const AuthUser = createParamDecorator(
+  (data, context: ExecutionContext) => {
+    const gqlCtx = GqlExecutionContext.create(context);
+    const request = gqlCtx.getContext().req;
+    return request.user;
+  },
+);
