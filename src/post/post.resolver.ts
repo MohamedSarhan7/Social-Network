@@ -5,6 +5,7 @@ import {
   Args,
   Parent,
   ResolveField,
+  Int,
 } from '@nestjs/graphql';
 import { PostService } from './post.service';
 import { Post } from './entities/post.entity';
@@ -57,8 +58,12 @@ export class PostResolver {
   user(@Parent() post: Post): Promise<User> {
     return this.postService.getUser(post);
   }
+  @ResolveField(() => Int)
+  likes(@Parent() post: Post): Promise<number> {
+    return this.postService.getTotalLikes(post.id);
+  }
   @ResolveField(() => [Comment])
   comments(@Parent() post: Post): Promise<Comment[]> {
-    return this.postService.getComments(post);
+    return this.postService.getComments(post.id);
   }
 }

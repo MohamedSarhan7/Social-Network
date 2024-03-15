@@ -44,6 +44,14 @@ type AuthResponse {
   rtToken: String!
 }
 
+type Like {
+  id: String!
+  userId: String!
+  user: User!
+  postId: String!
+  totalLikes: Int
+}
+
 type Query {
   users: [User!]!
   user(username: String!): User!
@@ -62,6 +70,8 @@ type Mutation {
   removeComment(id: String!): Comment!
   Login(loginInput: LoginInput!): AuthResponse!
   Register(registerInput: RegisterInput!): AuthResponse!
+  likePost(createLikeInput: CreateLikeInput!): Like!
+  unlikePost(updateLikeInput: UpdateLikeInput!): Like!
 }
 
 input CreatePostInput {
@@ -93,4 +103,12 @@ input RegisterInput {
   username: String!
   password: String!
   picture: String
+}
+
+input CreateLikeInput {
+  postId: String!
+}
+
+input UpdateLikeInput {
+  postId: String
 }

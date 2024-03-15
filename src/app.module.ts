@@ -9,6 +9,7 @@ import { CommentModule } from './comment/comment.module';
 import { AuthModule } from './auth/auth.module';
 import { GraphQLError } from 'graphql';
 import { APP_INTERCEPTOR } from '@nestjs/core';
+import { LikesModule } from './likes/likes.module';
 
 @Module({
   imports: [
@@ -42,6 +43,7 @@ import { APP_INTERCEPTOR } from '@nestjs/core';
     PostModule,
     CommentModule,
     AuthModule,
+    LikesModule,
   ],
   controllers: [],
   providers: [

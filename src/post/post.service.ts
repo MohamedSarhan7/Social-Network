@@ -32,10 +32,10 @@ export class PostService {
     return new User(user);
   }
 
-  async getComments(post: Post): Promise<Comment[]> {
+  async getComments(postId: string): Promise<Comment[]> {
     const comments = (
       await this.prismaService.comment.findMany({
-        where: { postId: post.id },
+        where: { postId },
       })
     ).map((comment) => new Comment(comment));
     return comments;
@@ -81,5 +81,14 @@ export class PostService {
     await this.prismaService.post.delete({ where: { id } });
     return '';
     // return `This action removes a #${id} post`;
+  }
+  async getTotalLikes(postId: string): Promise<number> {
+    const likes = await this.prismaService.likes.count({
+      where: { postId },
+      // distinct: ['userId'],
+    });
+    console.log(postId);
+    console.log(likes);
+    return likes;
   }
 }
