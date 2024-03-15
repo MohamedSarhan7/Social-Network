@@ -6,12 +6,12 @@ generator client {
 }
 
 datasource db {
-  provider = "mongodb"
+  provider = "postgres"
   url      = env("DATABASE_URL")
 }
 
 model User {
-  id                 String       @id @default(auto()) @map("_id") @db.ObjectId
+  id                 Int       @id @default(autoincrement())
   username           String
   password           String
   picture            String?
@@ -27,10 +27,10 @@ model User {
 }
 
 model Post {
-  id                String    @id @default(auto()) @map("_id") @db.ObjectId
+  id                Int    @id @default(autoincrement())
   content           String
-  userId            String    @db.ObjectId
-  user              User      @relation(fields: [userId], references: [id])
+  userId            Int    
+  user              User      @relation(fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
   comments          Comment[]
   likes             Likes[]
   created_at        DateTime  @default(now())
@@ -38,32 +38,32 @@ model Post {
 }
 
 model Comment {
-  id                String   @id @default(auto()) @map("_id") @db.ObjectId
+  id                Int      @id @default(autoincrement())
   content           String
-  userId            String   @db.ObjectId
-  user              User     @relation(fields: [userId], references: [id])
-  postId            String   @db.ObjectId
-  post              Post     @relation(fields: [postId], references: [id])
+  userId            Int      
+  user              User     @relation(fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+  postId            Int   
+  post              Post     @relation(fields: [postId], references: [id], onDelete: Cascade , onUpdate: Cascade)
   created_at        DateTime @default(now())
   updated_at        DateTime @updatedAt
 }
 
 model Likes {
-  id                String @id @default(auto()) @map("_id") @db.ObjectId
-  userId            String @db.ObjectId
-  user              User   @relation(fields: [userId], references: [id])
-  postId            String @db.ObjectId
-  post              Post   @relation(fields: [postId], references: [id])
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  user              User   @relation(fields: [userId], references: [id], onDelete: Cascade , onUpdate: Cascade)
+  postId            Int
+  post              Post   @relation(fields: [postId], references: [id], onDelete: Cascade , onUpdate: Cascade)
 
   @@unique([userId, postId])
 }
 
 model Friendship {
-  id                String @id @default(auto()) @map("_id") @db.ObjectId
-  senderId          String @db.ObjectId
+  id                Int      @id @default(autoincrement())
+  senderId          Int
   status            FriendshipStatus @default(PENDING)
   sender            User   @relation(name: "sender_friendship", fields: [senderId], references: [id])
-  reciverId         String @db.ObjectId
+  reciverId         Int
   reciver           User   @relation(name: "reciver_friendship", fields: [reciverId], references: [id])
 
   @@unique([reciverId, senderId])
