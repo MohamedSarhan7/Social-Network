@@ -3,61 +3,55 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreatePostInput } from './dto/create-post.input';
-import { UpdatePostInput } from './dto/update-post.input';
+import { CreatePostDto } from './dto/create-post.dto';
+import { UpdatePostDto } from './dto/update-post.dto';
 import { JwtPayload } from 'src/auth/types';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { Post } from './entities/post.entity';
-import { User } from 'src/user/entities/user.entity';
-import { Comment } from 'src/comment/entities/comment.entity';
-
+import { Post, Comment, User } from '@prisma/client';
 @Injectable()
 export class PostService {
   constructor(private readonly prismaService: PrismaService) {}
   async create(
     user: JwtPayload,
-    createPostInput: CreatePostInput,
+    createPostInput: CreatePostDto,
   ): Promise<Post> {
     const post = await this.prismaService.post.create({
       data: { ...createPostInput, userId: user.id },
     });
     console.log(post);
-    return new Post(post);
+    return post;
   }
 
   async getUser(post: Post): Promise<User> {
     const user = await this.prismaService.user.findUnique({
       where: { id: post.userId },
     });
-    return new User(user);
+    return user;
   }
 
-  async getComments(postId: string): Promise<Comment[]> {
-    const comments = (
-      await this.prismaService.comment.findMany({
-        where: { postId },
-      })
-    ).map((comment) => new Comment(comment));
+  async getComments(postId: number): Promise<Comment[]> {
+    const comments = await this.prismaService.comment.findMany({
+      where: { postId },
+    });
+
     return comments;
   }
   async findAll() {
-    const posts = (await this.prismaService.post.findMany()).map(
-      (post) => new Post(post),
-    );
+    const posts = await this.prismaService.post.findMany();
     return posts;
   }
 
-  async findOne(id: string): Promise<Post> {
+  async findOne(id: number): Promise<Post> {
     const post = await this.prismaService.post.findUnique({
       where: { id },
     });
     if (!post) throw new NotFoundException('no such comment with this id');
-    return new Post(post);
+    return post;
   }
 
   async update(
-    id: string,
-    updatePostInput: UpdatePostInput,
+    id: number,
+    updatePostInput: UpdatePostDto,
     user: JwtPayload,
   ): Promise<Post> {
     const post = await this.prismaService.post.findUnique({ where: { id } });
@@ -69,10 +63,10 @@ export class PostService {
       where: { id },
       data: { content: updatePostInput.content },
     });
-    return new Post(updatedPost);
+    return updatedPost;
   }
 
-  async remove(id: string, user: JwtPayload) {
+  async remove(id: number, user: JwtPayload) {
     const post = await this.prismaService.post.findUnique({ where: { id } });
     if (!post) throw new NotFoundException('no such post with this id');
     if (post.userId !== user.id) {
@@ -82,7 +76,7 @@ export class PostService {
     return '';
     // return `This action removes a #${id} post`;
   }
-  async getTotalLikes(postId: string): Promise<number> {
+  async getTotalLikes(postId: number): Promise<number> {
     const likes = await this.prismaService.likes.count({
       where: { postId },
       // distinct: ['userId'],

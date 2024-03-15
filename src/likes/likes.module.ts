@@ -1,9 +1,10 @@
 import { Module } from '@nestjs/common';
 import { LikesService } from './likes.service';
-import { LikesResolver } from './likes.resolver';
+import { LikesController } from './likes.controller';
 import { PostService } from 'src/post/post.service';
 
 @Module({
-  providers: [LikesResolver, LikesService, PostService],
+  providers: [LikesService, PostService],
+  controllers: [LikesController],
 })
 export class LikesModule {}

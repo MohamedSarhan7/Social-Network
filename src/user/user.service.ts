@@ -1,8 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { User } from './entities/user.entity';
 import { PrismaService } from '../prisma/prisma.service';
-// import { gqlE } from '@nestjs/graphql'
-
+import { User } from '@prisma/client';
 @Injectable()
 export class UserService {
   constructor(private readonly prismaService: PrismaService) {}
@@ -15,7 +13,7 @@ export class UserService {
       where: { username },
     });
     if (!user) throw new NotFoundException('user not found');
-    return new User(user);
+    return user;
   }
 
   // update(id: number, updateUserInput: UpdateUserInput) {

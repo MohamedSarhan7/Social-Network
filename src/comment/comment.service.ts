@@ -3,19 +3,17 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCommentInput } from './dto/create-comment.input';
-import { UpdateCommentInput } from './dto/update-comment.input';
+import { CreateCommentDto, UpdateCommentDto } from './dto';
 import { JwtPayload } from 'src/auth/types';
 import { PrismaService } from '../prisma/prisma.service';
-import { Comment } from './entities/comment.entity';
-import { User } from 'src/user/entities/user.entity';
+import { Comment, User } from '@prisma/client';
 
 @Injectable()
 export class CommentService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async create(
-    createCommentInput: CreateCommentInput,
+    createCommentInput: CreateCommentDto,
     user: JwtPayload,
   ): Promise<Comment> {
     const post = await this.prismaService.post.findUnique({
@@ -29,27 +27,25 @@ export class CommentService {
         userId: user.id,
       },
     });
-    return new Comment(comment);
+    return comment;
   }
 
   async findAll(): Promise<Comment[]> {
-    const comments = (await this.prismaService.comment.findMany()).map(
-      (comment) => new Comment(comment),
-    );
+    const comments = await this.prismaService.comment.findMany();
     return comments;
   }
 
-  async findOne(id: string): Promise<Comment> {
+  async findOne(id: number): Promise<Comment> {
     const comment = await this.prismaService.comment.findUnique({
       where: { id },
     });
     if (!comment) throw new NotFoundException('no such comment with this id');
-    return new Comment(comment);
+    return comment;
   }
 
   async update(
-    id: string,
-    updateCommentInput: UpdateCommentInput,
+    id: number,
+    updateCommentInput: UpdateCommentDto,
     user: JwtPayload,
   ): Promise<Comment> {
     const comment = await this.prismaService.comment.findUnique({
@@ -63,10 +59,10 @@ export class CommentService {
       where: { id },
       data: { content: updateCommentInput.content },
     });
-    return new Comment(updatedComment);
+    return updatedComment;
   }
 
-  async remove(id: string, user: JwtPayload) {
+  async remove(id: number, user: JwtPayload) {
     const comment = await this.prismaService.comment.findUnique({
       where: { id },
     });
@@ -81,6 +77,6 @@ export class CommentService {
     const user = await this.prismaService.user.findUnique({
       where: { id: comment.userId },
     });
-    return new User(user);
+    return user;
   }
 }

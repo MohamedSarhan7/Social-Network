@@ -1,6 +1,6 @@
 export type JwtPayload = {
   username: string;
-  id: string;
+  id: number;
   iat?: number;
   exp?: number;
   refreshToken?: string;

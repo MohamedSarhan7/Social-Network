@@ -1,13 +1,11 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
-import { LoginInput } from './dto/auth-login.input';
-import { RegisterInput } from './dto/auth-register.input';
+import { LoginDto, RegisterDto, AuthResponse } from './dto';
 import * as bcrypt from 'bcryptjs';
 import { Tokens } from './types';
 import { JwtService } from '@nestjs/jwt';
 import { JwtPayload } from './types/jwtPayload.type';
 import { ConfigService } from '@nestjs/config';
 import { PrismaService } from 'src/prisma/prisma.service';
-import { AuthResponse } from './dto/auth-response';
 @Injectable()
 export class AuthService {
   constructor(
@@ -16,7 +14,7 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async login(loginInput: LoginInput) {
+  async login(loginInput: LoginDto) {
     const userExists = await this.prismaService.user.findUnique({
       where: {
         username: loginInput.username,
@@ -41,7 +39,7 @@ export class AuthService {
     });
   }
 
-  async register(registerInput: RegisterInput): Promise<AuthResponse> {
+  async register(registerInput: RegisterDto): Promise<AuthResponse> {
     const userExists = await this.prismaService.user.findUnique({
       where: {
         username: registerInput.username,
@@ -73,7 +71,7 @@ export class AuthService {
     return bcrypt.hash(data, 10);
   }
 
-  private async genrateTokens(id: string, username: string): Promise<Tokens> {
+  private async genrateTokens(id: number, username: string): Promise<Tokens> {
     const JwtPayload: JwtPayload = {
       id,
       username,
@@ -82,11 +80,11 @@ export class AuthService {
     const [at, rt] = await Promise.all([
       this.jwtService.signAsync(JwtPayload, {
         secret: this.configService.get('access_token_secret'),
-        expiresIn: this.configService.get('access_token_expiresin'),
+        expiresIn: this.configService.get('access_token_expires_in'),
       }),
       this.jwtService.signAsync(JwtPayload, {
         secret: this.configService.get('refresh_token_secret'),
-        expiresIn: this.configService.get('refresh_token_expiresin'),
+        expiresIn: this.configService.get('refresh_token_expires_in'),
       }),
     ]);
 
@@ -96,7 +94,7 @@ export class AuthService {
     };
   }
 
-  private async updateRtHash(id: string, value: string | null) {
+  private async updateRtHash(id: number, value: string | null) {
     // const hash = await this.hashData(rt);
     await this.prismaService.user.update({
       where: { id },
