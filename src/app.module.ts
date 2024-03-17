@@ -11,6 +11,7 @@ import { LikesModule } from './likes/likes.module';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
+      envFilePath: ['.env', '.env.dev'],
     }),
     UserModule,
     PostModule,

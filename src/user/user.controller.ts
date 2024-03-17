@@ -4,7 +4,7 @@ import { JwtPayload } from 'src/auth/types';
 import { AuthGuard } from '@nestjs/passport';
 import { AuthUser } from 'src/common/decorators';
 
-@Controller('users')
+@Controller({ version: '1', path: 'users' })
 @UseGuards(AuthGuard('jwt')) // Assuming you're using JWT authentication
 export class UserController {
   constructor(private readonly userService: UserService) {}
